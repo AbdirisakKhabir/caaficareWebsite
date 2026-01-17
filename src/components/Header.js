@@ -60,7 +60,7 @@ const Header = ({
       onClick: onAppointmentClick,
     },
     {
-      title: "Nursing Care",
+      title: "Appointment Nurse",
       subtitle: "In-home services",
       onClick: onNurseAppointmentClick,
     },

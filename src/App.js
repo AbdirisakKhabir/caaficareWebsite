@@ -18,7 +18,6 @@ function App() {
   const [isNurseApplyModalOpen, setIsNurseApplyModalOpen] = useState(false);
   const [isDoctorApplyModalOpen, setIsDoctorApplyModalOpen] = useState(false);
 
-  // --- Handlers ---
   const handleApplyNurseClick = () => setIsNurseApplyModalOpen(true);
   const handleApplyDoctorClick = () => setIsDoctorApplyModalOpen(true);
 

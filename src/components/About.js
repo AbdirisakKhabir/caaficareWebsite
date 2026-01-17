@@ -1,61 +1,109 @@
 import React from "react";
+import { CheckCircle2, Clock, Smartphone, Pill } from "lucide-react";
 
 const About = () => {
+  const features = [
+    { icon: <Clock className="w-5 h-5" />, text: "24/7 Unlimited Access" },
+    {
+      icon: <Smartphone className="w-5 h-5" />,
+      text: "One-Click Video Consult",
+    },
+    { icon: <Pill className="w-5 h-5" />, text: "Doorstep Medicine Delivery" },
+    {
+      icon: <CheckCircle2 className="w-5 h-5" />,
+      text: "Qualified Caregivers",
+    },
+  ];
+
   return (
-    <section id="about-us" className="bg-white py-12 flex justify-center">
-      <div className="bg-[#6CA9F5] max-w-6xl rounded-xl p-10 lg:p-14 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-        {/* Left Section - Doctor Image */}
-        <div className="flex justify-center">
-          <img
-            src="/hero2.jpg"
-            alt="Doctor"
-            className="w-[350px] lg:w-[400px] rounded-2xl object-cover"
-          />
-        </div>
+    <section id="about-us" className="bg-white py-24 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left Section - Image with Floating Badge */}
+          <div className="relative group">
+            <div className="absolute -top-6 -left-6 w-64 h-64 bg-blue-50 rounded-full blur-3xl -z-10 group-hover:bg-blue-100 transition-colors duration-500" />
 
-        {/* Right Section - Text */}
-        <div className="text-white space-y-4">
-          <div>
-            <p className="text-sm font-poppins opacity-80">Greetings & Welcome</p>
-            <p className="text-base font-semibold font-poppins">
-              Dr. Sabina Hussain Joly
-            </p>
+            <div className="relative">
+              <img
+                src="/hero123.png"
+                alt="Medical Professional"
+                className="w-full max-w-[450px] aspect-[4/5] rounded-[3rem] object-cover shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+
+              {/* Floating Status Card */}
+              <div className="absolute bottom-10 -right-4 lg:-right-10 bg-white p-6 rounded-3xl shadow-2xl border border-blue-50 animate-float">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#6CA9F5] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <Clock size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">
+                      Response Time
+                    </p>
+                    <p className="text-lg font-black text-gray-800 tracking-tight">
+                      Under 5 Mins
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <h2 className="text-3xl lg:text-4xl font-bold font-poppins leading-snug">
-              Book an appointment
-            </h2>
-            <p className="text-[#6EF789] text-xl font-semibold font-poppins">
-              home with one click
-            </p>
-          </div>
+          {/* Right Section - Content */}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full">
+                <span className="w-2 h-2 bg-[#6CA9F5] rounded-full animate-pulse" />
+                <span className="text-xs font-black text-[#6CA9F5] uppercase tracking-wider">
+                  Welcome to CaafiCare
+                </span>
+              </div>
 
-          <div className="space-y-4 text-sm leading-relaxed font-poppins">
-            <p>
-              Patients often need three fundamental features: the ability to
-              book or cancel appointments, the option to obtain prescription
-              drugs, and easy access to medical information. All these needs are
-              met through Caafi.
-            </p>
+              <h2 className="text-4xl lg:text-5xl font-black text-gray-900 font-poppins leading-tight">
+                Healthcare that <br />
+                <span className="text-[#6CA9F5]">Comes to You</span>
+              </h2>
 
-            <p>
-              Now, you can reach our team of qualified doctors with just one
-              click from your smartphone or computer, 24/7. Caafi is the only
-              mobile healthcare app easily accessible to all users, offering a
-              hotline, customer service, assistance for reservations, and
-              doorstep medication delivery.
-            </p>
+              <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                We’ve redefined medical access in Somalia. No more long queues
+                or travel stress—reach qualified doctors and professional nurses
+                with just one click.
+              </p>
+            </div>
 
-            <p>
-              Simply download the app, register, select a doctor, and make the
-              payment to book your preferred time slot for a video consultation.
-              Afterward, receive an e-prescription or order medicines and lab
-              tests directly within the app.
-            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {features.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-blue-100 hover:bg-white transition-all group"
+                >
+                  <div className="text-[#6CA9F5] group-hover:scale-110 transition-transform">
+                    {item.icon}
+                  </div>
+                  <span className="text-sm font-bold text-gray-700">
+                    {item.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-500 leading-relaxed font-medium">
+                Whether you need a video consultation, a home-visit nurse, or
+                medication delivery, Caafi is the only mobile healthcare app
+                offering a complete ecosystem—from booking to e-prescriptions.
+              </p>
+            </div>
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-15px); }
+        }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+      `}</style>
     </section>
   );
 };

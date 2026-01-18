@@ -9,7 +9,10 @@ import {
   HiChevronRight,
   HiSearch,
   HiFilter,
-  HiLocationMarker
+  HiLocationMarker,
+  HiMail,
+  HiPhone,
+  HiDocumentText,
 } from "react-icons/hi";
 
 const NursesList = () => {
@@ -291,7 +294,6 @@ const NursesList = () => {
     </div>
   );
 };
-
 const NurseCard = ({ nurse }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -300,28 +302,31 @@ const NurseCard = ({ nurse }) => {
   return (
     <div className="group relative">
       {/* Card Container */}
-      <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group-hover:border-green-200 group-hover:-translate-y-1 h-full">
-        {/* Compact Header */}
-        <div className="relative p-8 bg-gradient-to-b from-green-50 to-white">
-          {/* Nurse Image with Availability Indicator */}
-          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white">
-              {nurse.image && !imageError ? (
-                <img
-                  src={nurse.image}
-                  alt={nurse.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200">
-                  <HiUser className="w-10 h-10 text-green-400" />
-                </div>
-              )}
-              {/* Availability Indicator on Image */}
+      <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group-hover:border-blue-200 group-hover:-translate-y-1 h-full flex flex-col">
+        {/* Header with Image */}
+        <div className="relative p-6 bg-gradient-to-br from-blue-50 via-blue-100 to-white">
+          {/* Nurse Image Container */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white">
+                {nurse.image && !imageError ? (
+                  <img
+                    src={nurse.image}
+                    alt={nurse.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
+                    <HiUser className="w-12 h-12 text-blue-400" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Availability Indicator in front of the circle */}
               {isAvailable && (
-                <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-md flex items-center justify-center">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center z-10">
+                  <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></span>
                 </div>
               )}
             </div>
@@ -329,44 +334,62 @@ const NurseCard = ({ nurse }) => {
         </div>
 
         {/* Content */}
-        <div className="pt-8 pb-4 px-4">
+        <div className="p-5 flex-1 flex flex-col">
           {/* Name and Qualifications */}
-          <div className="text-center mb-3">
-            <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-black text-gray-900 mb-1 line-clamp-1">
               {nurse.name}
             </h3>
-            <p className="text-xs text-green-600 font-semibold line-clamp-1">
+            <p className="text-sm text-blue-600 font-bold flex items-center justify-center gap-1">
+              <HiDocumentText className="w-4 h-4" />
               {nurse.qualifications || "Certified Nurse"}
             </p>
           </div>
 
-          {/* Compact Details */}
-          <div className="space-y-2 mb-4">
+          {/* Bio */}
+          {nurse.bio && (
+            <p className="text-xs text-gray-600 mb-4 line-clamp-2 text-center leading-relaxed">
+              {nurse.bio}
+            </p>
+          )}
+
+          {/* Details Section */}
+          <div className="space-y-2 mb-4 flex-1">
             {nurse.job_experience && (
-              <div className="flex items-center gap-2 text-xs text-gray-600">
-                <HiBriefcase className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiBriefcase className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <span className="line-clamp-1">{nurse.job_experience}</span>
               </div>
             )}
+
             {(nurse.district || nurse.city || nurse.location) && (
-              <div className="flex items-center gap-2 text-xs text-gray-600">
-                <HiLocationMarker className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiLocationMarker className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <span className="line-clamp-1">
                   {nurse.district || nurse.city || nurse.location}
                 </span>
               </div>
             )}
+
             {nurse.languages && (
-              <div className="flex items-center gap-2 text-xs text-gray-600">
-                <HiGlobeAlt className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiGlobeAlt className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <span className="line-clamp-1">{nurse.languages}</span>
               </div>
             )}
+
+           
+
+            
+
+            
           </div>
 
-          {/* Action Button */}
-          <div className="pt-3 border-t border-gray-100">
-            <button className="w-full py-2 bg-gradient-to-r from-blue-400 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+          {/* Status and Action */}
+          <div className="pt-4 border-t border-gray-100 space-y-2">
+           
+            
+            <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
               Book Nurse
             </button>
           </div>
@@ -374,7 +397,7 @@ const NurseCard = ({ nurse }) => {
       </div>
 
       {/* Hover Effect Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-blue-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-blue-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl"></div>
     </div>
   );
 };

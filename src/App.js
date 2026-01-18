@@ -81,6 +81,9 @@ function AppContent({ onApplyNurseClick, onApplyDoctorClick }) {
                 onAppointmentClick={handleAppointmentClick}
                 onNurseAppointmentClick={handleNurseAppointmentClick}
               />
+              <DoctorsList />
+              <NursesList />
+              <HospitalsList />
               <WhyChoose />
               <About />
               <Professions />

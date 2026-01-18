@@ -1,6 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { HiMenuAlt3, HiX, HiChevronDown, HiVideoCamera } from "react-icons/hi";
+import { 
+  HiMenuAlt3, 
+  HiX, 
+  HiChevronDown, 
+  HiVideoCamera, 
+  HiHome,
+  HiOfficeBuilding,
+  HiUserGroup,
+  HiBriefcase,
+  HiInformationCircle
+} from "react-icons/hi";
 
 const Header = ({
   onAppointmentClick,
@@ -56,30 +66,40 @@ const Header = ({
 
   const navLinks = [
     {
+      title: "Home",
+      subtitle: "Back to home",
+      href: "/",
+     
+    },
+    {
       title: "Video Consulting",
       subtitle: "Find a doctor",
       onClick: onVideoConsultingClick,
-     
+    
     },
     {
       title: "Hospitals",
       subtitle: "Find a hospital",
       onClick: onAppointmentClick,
+     
     },
     {
       title: "Nurses",
       subtitle: "Find a nurse",
       onClick: onNurseAppointmentClick,
+     
     },
     {
       title: "Join Our Team",
       subtitle: "Apply as specialist",
       isDropdown: true,
+   
     },
     {
       title: "About Us",
       subtitle: "Our mission",
       href: "/#about-us",
+      
     },
   ];
 

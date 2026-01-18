@@ -347,7 +347,7 @@ const HospitalCard = ({ hospital }) => {
 
           {/* Action Button */}
           <div className="pt-3 border-t border-gray-100">
-            <button className="w-full py-2.5 bg-gradient-to-r from-blue-400 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+            <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
               View Details
             </button>
           </div>

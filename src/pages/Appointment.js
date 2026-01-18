@@ -16,7 +16,7 @@ const mockHospitals = [
     specialties: ["Dermatology", "ENT"],
     doctors: 18,
     rating: 4.2,
-    location: "Hargeisa",
+    location: "Muqdisho",
   },
   {
     id: 3,
@@ -40,12 +40,12 @@ const mockHospitals = [
     specialties: ["Cardiology", "General Surgery"],
     doctors: 22,
     rating: 4.3,
-    location: "Bosaso",
+    location: "Boosaso",
   },
 ];
 
 const allSpecialties = Array.from(
-  new Set(mockHospitals.flatMap((h) => h.specialties))
+  new Set(mockHospitals.flatMap((h) => h.specialties)),
 ).sort();
 
 const Appointment = () => {

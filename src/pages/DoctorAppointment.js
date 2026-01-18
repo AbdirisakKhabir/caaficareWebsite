@@ -70,8 +70,8 @@ const DoctorAppointment = () => {
 
       try {
         const [hospitalsRes, specialtiesRes] = await Promise.all([
-          axios.get("https://caaficare.so/api/hospitals"),
-          axios.get("https://caaficare.so/api/doctor/specialties"),
+          axios.get("https://app.caaficare.so/api/hospitals"),
+          axios.get("https://app.caaficare.so/api/doctor/specialties"),
         ]);
         setHospitals(hospitalsRes.data.data || []);
         setSpecialties(specialtiesRes.data.data || []);
@@ -117,8 +117,8 @@ const DoctorAppointment = () => {
         const customer = JSON.parse(localStorage.getItem("customer"));
         const payload = { ...values, customer_id: customer?.id };
         const res = await axios.post(
-          "https://caaficare.so/api/appointment",
-          payload
+          "https://app.caaficare.so/api/appointment",
+          payload,
         );
         if (res.data.success) {
           setIsSuccess(true);
@@ -146,7 +146,7 @@ const DoctorAppointment = () => {
           specialty: formik.values.specialty,
         });
         const res = await axios.get(
-          `https://caaficare.so/api/appointment_doctors?${params.toString()}`
+          `https://app.caaficare.so/api/appointment_doctors?${params.toString()}`,
         );
         setDoctors(res.data.data || []);
       } catch (error) {

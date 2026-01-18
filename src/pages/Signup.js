@@ -17,8 +17,8 @@ const Signup = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://caaficare.so/api/customer",
-        form
+        "https://app.caaficare.so/api/customer",
+        form,
       );
 
       if (response.data.success) {

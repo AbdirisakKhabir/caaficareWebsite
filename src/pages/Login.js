@@ -13,8 +13,8 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://caaficare.so/api/customerLogin",
-        { phone }
+        "https://app.caaficare.so/api/customerLogin",
+        { phone },
       );
 
       if (response.data.user) {

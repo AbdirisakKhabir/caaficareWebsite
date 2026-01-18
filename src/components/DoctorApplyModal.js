@@ -145,7 +145,7 @@ const DoctorApplyModal = ({ isOpen, onClose }) => {
       const fetchHospitals = async () => {
         try {
           setLoadingHospitals(true);
-          const res = await axios.get("https://caaficare.so/api/hospitals");
+          const res = await axios.get("https://app.caaficare.so/api/hospitals");
           setHospitals(res.data.data || []);
         } catch (err) {
           console.error("Hospital load failed");
@@ -189,7 +189,7 @@ const DoctorApplyModal = ({ isOpen, onClose }) => {
         } else data.append(key, formData[key]);
       });
 
-      const response = await fetch("https://caaficare.so/api/doctor", {
+      const response = await fetch("https://app.caaficare.so/api/doctor", {
         method: "POST",
         body: data,
       });

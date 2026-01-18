@@ -50,8 +50,8 @@ const NurseAppointment = () => {
       setLoading(true);
       try {
         const [nursesRes, servicesRes] = await Promise.all([
-          axios.get("https://caaficare.so/api/nurse?status=Active"),
-          axios.get("https://caaficare.so/api/services"),
+          axios.get("https://app.caaficare.so/api/nurse?status=Active"),
+          axios.get("https://app.caaficare.so/api/services"),
         ]);
         setNurses(nursesRes.data.data || []);
         setFilteredNurses(nursesRes.data.data || []);
@@ -70,14 +70,14 @@ const NurseAppointment = () => {
   useEffect(() => {
     const filtered = formData.location
       ? nurses.filter((n) =>
-          n.location?.toLowerCase().includes(formData.location.toLowerCase())
+          n.location?.toLowerCase().includes(formData.location.toLowerCase()),
         )
       : nurses;
     setFilteredNurses(filtered);
 
     setSelectedNurse(nurses.find((n) => n.id === parseInt(formData.nurse_id)));
     setSelectedService(
-      services.find((s) => s.id === parseInt(formData.service_id))
+      services.find((s) => s.id === parseInt(formData.service_id)),
     );
   }, [
     formData.location,
@@ -101,8 +101,8 @@ const NurseAppointment = () => {
     setIsSubmitting(true);
     try {
       const response = await axios.post(
-        "https://caaficare.so/api/nurses_appointment",
-        formData
+        "https://app.caaficare.so/api/nurses_appointment",
+        formData,
       );
       if (response.data.success) {
         setIsSuccess(true);
@@ -125,7 +125,7 @@ const NurseAppointment = () => {
         onApplyNurseClick={() => {}}
         onApplyDoctorClick={() => {}}
       />
-      
+
       <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           {isSuccess ? (
@@ -137,7 +137,8 @@ const NurseAppointment = () => {
                 Request Sent!
               </h2>
               <p className="text-gray-500 text-lg mb-6">
-                Your nursing appointment request has been submitted successfully.
+                Your nursing appointment request has been submitted
+                successfully.
               </p>
               <p className="text-sm text-gray-400">
                 Redirecting you to home page...
@@ -323,7 +324,8 @@ const NurseAppointment = () => {
                         {selectedNurse.name}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {selectedNurse.qualifications || "Certified Professional"}
+                        {selectedNurse.qualifications ||
+                          "Certified Professional"}
                       </p>
                     </div>
                   )}

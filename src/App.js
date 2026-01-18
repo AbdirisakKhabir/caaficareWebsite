@@ -13,7 +13,9 @@ import Signup from "./pages/Signup";
 import NurseAppointment from "./pages/NurseAppointment";
 import DoctorAppointment from "./pages/DoctorAppointment";
 import "./App.css";
-
+import DoctorsList from "./pages/DoctorsList";
+import NursesList from "./pages/NursesList";
+import HospitalsList from "./pages/HospitalsList";
 function App() {
   const [isNurseApplyModalOpen, setIsNurseApplyModalOpen] = useState(false);
   const [isDoctorApplyModalOpen, setIsDoctorApplyModalOpen] = useState(false);
@@ -73,6 +75,10 @@ function AppContent({ onApplyNurseClick, onApplyDoctorClick }) {
                 onAppointmentClick={handleAppointmentClick}
                 onNurseAppointmentClick={handleNurseAppointmentClick}
               />
+
+              <DoctorsList />
+              <NursesList />
+              <HospitalsList />
               <WhyChoose />
               <About />
               <Professions />

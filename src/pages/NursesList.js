@@ -148,9 +148,9 @@ const NursesList = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full mb-4">
-            <HiUser className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-semibold text-green-600">Nursing Care</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-4">
+            {/* <HiUser className="w-5 h-5 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-600">Nursing Care</span> */}
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
             Find Your Nurse
@@ -366,7 +366,7 @@ const NurseCard = ({ nurse }) => {
 
           {/* Action Button */}
           <div className="pt-3 border-t border-gray-100">
-            <button className="w-full py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+            <button className="w-full py-2 bg-gradient-to-r from-blue-400 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
               Book Nurse
             </button>
           </div>

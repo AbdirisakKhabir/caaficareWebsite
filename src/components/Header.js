@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { HiMenuAlt3, HiX, HiChevronDown } from "react-icons/hi";
+import { HiMenuAlt3, HiX, HiChevronDown, HiVideoCamera } from "react-icons/hi";
 
 const Header = ({
   onAppointmentClick,
   onNurseAppointmentClick,
+  onVideoConsultingClick,
   onApplyNurseClick,
   onApplyDoctorClick,
 }) => {
@@ -55,13 +56,19 @@ const Header = ({
 
   const navLinks = [
     {
-      title: "Appointment",
-      subtitle: "Book a doctor",
+      title: "Video Consulting",
+      subtitle: "Find a doctor",
+      onClick: onVideoConsultingClick,
+     
+    },
+    {
+      title: "Hospitals",
+      subtitle: "Find a hospital",
       onClick: onAppointmentClick,
     },
     {
-      title: "Appointment Nurse",
-      subtitle: "In-home services",
+      title: "Nurses",
+      subtitle: "Find a nurse",
       onClick: onNurseAppointmentClick,
     },
     {
@@ -101,78 +108,82 @@ const Header = ({
 
           {/* DESKTOP NAVIGATION */}
           <nav className="hidden lg:flex items-center gap-6">
-            {navLinks.map((link, idx) => (
-              <div
-                key={idx}
-                className="relative"
-                ref={link.isDropdown ? dropdownRef : null}
-              >
-                {link.isDropdown ? (
-                  <button
-                    onClick={() => setIsApplyOpen(!isApplyOpen)}
-                    className="flex flex-col items-start group py-1"
-                  >
-                    <span className="text-gray-800 text-sm font-bold group-hover:text-[#6CA9F5] flex items-center gap-1 transition-colors">
-                      {link.title}
-                      <HiChevronDown
-                        className={`transition-transform duration-300 ${
-                          isApplyOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </span>
-                    <span className="text-[10px] text-gray-400 font-medium">
-                      {link.subtitle}
-                    </span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (link.onClick) {
-                        link.onClick();
-                      } else if (link.href?.startsWith("/#")) {
-                        window.location.href = link.href;
-                      } else if (link.href) {
-                        navigate(link.href);
-                      }
-                    }}
-                    className="flex flex-col items-start group py-1"
-                  >
-                    <span className="text-gray-800 text-sm font-bold group-hover:text-[#6CA9F5] transition-colors">
-                      {link.title}
-                    </span>
-                    <span className="text-[10px] text-gray-400 font-medium group-hover:text-gray-500 transition-colors">
-                      {link.subtitle}
-                    </span>
-                  </button>
-                )}
+            {navLinks.map((link, idx) => {
+              const IconComponent = link.icon;
+              return (
+                <div
+                  key={idx}
+                  className="relative"
+                  ref={link.isDropdown ? dropdownRef : null}
+                >
+                  {link.isDropdown ? (
+                    <button
+                      onClick={() => setIsApplyOpen(!isApplyOpen)}
+                      className="flex flex-col items-start group py-1"
+                    >
+                      <span className="text-gray-800 text-sm font-bold group-hover:text-[#6CA9F5] flex items-center gap-1 transition-colors">
+                        {link.title}
+                        <HiChevronDown
+                          className={`transition-transform duration-300 ${
+                            isApplyOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        {link.subtitle}
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (link.onClick) {
+                          link.onClick();
+                        } else if (link.href?.startsWith("/#")) {
+                          window.location.href = link.href;
+                        } else if (link.href) {
+                          navigate(link.href);
+                        }
+                      }}
+                      className="flex flex-col items-start group py-1"
+                    >
+                      <span className="text-gray-800 text-sm font-bold group-hover:text-[#6CA9F5] flex items-center gap-1 transition-colors">
+                        {IconComponent && <IconComponent className="w-4 h-4" />}
+                        {link.title}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-medium group-hover:text-gray-500 transition-colors">
+                        {link.subtitle}
+                      </span>
+                    </button>
+                  )}
 
-                {/* Apply Dropdown */}
-                {link.isDropdown && isApplyOpen && (
-                  <div className="absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in zoom-in-95">
-                    <button
-                      onClick={() => {
-                        onApplyNurseClick();
-                        setIsApplyOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-[#6CA9F5] transition-colors"
-                    >
-                      Apply as Nurse
-                    </button>
-                    <button
-                      onClick={() => {
-                        onApplyDoctorClick();
-                        setIsApplyOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-[#6CA9F5] transition-colors"
-                    >
-                      Apply as Doctor
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {/* Apply Dropdown */}
+                  {link.isDropdown && isApplyOpen && (
+                    <div className="absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in zoom-in-95">
+                      <button
+                        onClick={() => {
+                          onApplyNurseClick();
+                          setIsApplyOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-[#6CA9F5] transition-colors"
+                      >
+                        Apply as Nurse
+                      </button>
+                      <button
+                        onClick={() => {
+                          onApplyDoctorClick();
+                          setIsApplyOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-[#6CA9F5] transition-colors"
+                      >
+                        Apply as Doctor
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </nav>
         </div>
 
@@ -207,7 +218,13 @@ const Header = ({
                       {user.phone}
                     </p>
                   </div>
-
+                  <Link
+                    to="/appointments"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="block px-3 py-2.5 text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all"
+                  >
+                    My History
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all"
@@ -253,58 +270,62 @@ const Header = ({
         }`}
       >
         <div className="px-6 space-y-3">
-          {navLinks.map((link, idx) => (
-            <div key={idx}>
-              {link.isDropdown ? (
-                <div className="bg-gray-50 rounded-3xl p-5 mb-2">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                    Team Applications
-                  </span>
-                  <div className="flex flex-col gap-4 mt-4">
-                    <button
-                      onClick={() => {
-                        onApplyNurseClick();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="text-left font-bold text-gray-700 hover:text-[#6CA9F5]"
-                    >
-                      Nurse Enrollment
-                    </button>
-                    <button
-                      onClick={() => {
-                        onApplyDoctorClick();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="text-left font-bold text-gray-700 hover:text-[#6CA9F5]"
-                    >
-                      Doctor Enrollment
-                    </button>
+          {navLinks.map((link, idx) => {
+            const IconComponent = link.icon;
+            return (
+              <div key={idx}>
+                {link.isDropdown ? (
+                  <div className="bg-gray-50 rounded-3xl p-5 mb-2">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      Team Applications
+                    </span>
+                    <div className="flex flex-col gap-4 mt-4">
+                      <button
+                        onClick={() => {
+                          onApplyNurseClick();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="text-left font-bold text-gray-700 hover:text-[#6CA9F5]"
+                      >
+                        Nurse Enrollment
+                      </button>
+                      <button
+                        onClick={() => {
+                          onApplyDoctorClick();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="text-left font-bold text-gray-700 hover:text-[#6CA9F5]"
+                      >
+                        Doctor Enrollment
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (link.onClick) {
-                      link.onClick();
-                    } else if (link.href) {
-                      navigate(link.href);
-                    }
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full flex flex-col items-start px-4 py-3 hover:bg-blue-50 rounded-2xl transition-all"
-                >
-                  <span className="text-base font-black text-gray-800">
-                    {link.title}
-                  </span>
-                  <span className="text-xs text-gray-400 font-medium">
-                    {link.subtitle}
-                  </span>
-                </button>
-              )}
-            </div>
-          ))}
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (link.onClick) {
+                        link.onClick();
+                      } else if (link.href) {
+                        navigate(link.href);
+                      }
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex flex-col items-start px-4 py-3 hover:bg-blue-50 rounded-2xl transition-all"
+                  >
+                    <span className="text-base font-black text-gray-800 flex items-center gap-2">
+                      {IconComponent && <IconComponent className="w-5 h-5" />}
+                      {link.title}
+                    </span>
+                    <span className="text-xs text-gray-400 font-medium">
+                      {link.subtitle}
+                    </span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
 
           {!user && (
             <div className="pt-6 border-t border-gray-100 flex flex-col gap-3">

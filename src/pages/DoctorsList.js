@@ -148,8 +148,8 @@ const DoctorsList = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-4">
-            <HiVideoCamera className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-600">Video Consultation</span>
+            {/* <HiVideoCamera className="w-5 h-5 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-600">Video Consultation</span> */}
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
             Find Your Specialist
@@ -377,7 +377,7 @@ const DoctorCard = ({ doctor }) => {
               </div>
             </div>
             
-            <button className="w-full py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+            <button className="w-full py-2 bg-gradient-to-r from-blue-400 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
               Book Now
             </button>
           </div>
@@ -385,7 +385,7 @@ const DoctorCard = ({ doctor }) => {
       </div>
 
       {/* Hover Effect Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl"></div>
     </div>
   );
 };

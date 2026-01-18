@@ -143,8 +143,8 @@ const HospitalsList = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full mb-4">
-            <BuildingIcon className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-semibold text-purple-600">Medical Facilities</span>
+            {/* <BuildingIcon className="w-5 h-5 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-600">Medical Facilities</span> */}
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
             Find Hospitals & Clinics
@@ -308,7 +308,7 @@ const HospitalCard = ({ hospital }) => {
               <span
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
                   hospital.status === "Active" || hospital.status === "Open"
-                    ? "bg-green-100 text-green-700 border border-green-200"
+                    ? "bg-blue-100 text-blue-700 border border-blue-200"
                     : "bg-gray-100 text-gray-600 border border-gray-200"
                 }`}
               >
@@ -324,7 +324,7 @@ const HospitalCard = ({ hospital }) => {
         {/* Content */}
         <div className="p-4 flex-1 flex flex-col">
           {/* Hospital Name */}
-          <h3 className="text-base font-black text-gray-900 mb-3 line-clamp-2 min-h-[3rem] group-hover:text-purple-600 transition-colors">
+          <h3 className="text-base font-black text-gray-900 mb-3 line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors">
             {hospital.name}
           </h3>
 
@@ -332,7 +332,7 @@ const HospitalCard = ({ hospital }) => {
           <div className="space-y-2.5 mb-4 flex-1">
             {hospital.address && (
               <div className="flex items-start gap-2 text-xs text-gray-600">
-                <HiLocationMarker className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                <HiLocationMarker className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                 <span className="line-clamp-2 leading-relaxed">{hospital.address}</span>
               </div>
             )}
@@ -347,7 +347,7 @@ const HospitalCard = ({ hospital }) => {
 
           {/* Action Button */}
           <div className="pt-3 border-t border-gray-100">
-            <button className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+            <button className="w-full py-2.5 bg-gradient-to-r from-blue-400 to-blue-400 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
               View Details
             </button>
           </div>

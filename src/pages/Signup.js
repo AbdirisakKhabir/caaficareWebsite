@@ -11,26 +11,65 @@ const Signup = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const generateVerificationCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
+  const sendVerificationCode = async (phoneNumber, code) => {
+    try {
+      const token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIzMzl3aG4xVWVvWTVabGtHS0JhVG9JbnQyc1dCZ29xVSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwNDY2NDY4fQ._Ul8BYxqcqYQ1k1fNlRZEhQeQ5Y_uzG9zWhtsXuCFdI";
+      const instance_id =
+        "eyJ1aWQiOiIzMzl3aG4xVWVvWTVabGtHS0JhVG9JbnQyc1dCZ29xVSIsImNsaWVudF9pZCI6IkNhYWZpQ2FyZSJ9";
+
+      const message = `*CAAFICare Verification*\n\nYour verification code is: *${code}*\n\nUser Type: Customer\n\nThis code will expire in 10 minutes.`;
+
+      let cleanPhone = phoneNumber.replace(/\D/g, "");
+      if (cleanPhone.startsWith("0")) {
+        cleanPhone = "252" + cleanPhone.substring(1);
+      } else if (cleanPhone.startsWith("+252")) {
+        cleanPhone = cleanPhone.substring(1);
+      } else if (!cleanPhone.startsWith("252")) {
+        cleanPhone = "252" + cleanPhone;
+      }
+
+      const apiUrl = `https://bawa.app/api/v1/send-text?token=${token}&instance_id=${instance_id}&jid=${cleanPhone}@s.whatsapp.net&msg=${encodeURIComponent(
+        message
+      )}`;
+
+      await fetch(apiUrl);
+      return true;
+    } catch (error) {
+      console.error("Error sending verification code:", error);
+      throw error;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(
-        "https://app.caaficare.so/api/customer",
-        form,
-      );
+      const verificationCode = generateVerificationCode();
+      
+      // Send verification code
+      await sendVerificationCode(form.phone, verificationCode);
 
-      if (response.data.success) {
-        localStorage.setItem("customer", JSON.stringify(response.data.data));
-        // Instant Header Update
-        window.dispatchEvent(new Event("storage"));
+      // Navigate to verify page
+      navigate("/verify", {
+        state: {
+          phone: form.phone,
+          full_name: form.full_name,
+          userType: "customer",
+          userTypeLabel: "Customer's Account",
+          code: verificationCode,
+          isNewUser: true,
+          existingUserData: null,
+        },
+      });
 
-        toast.success("Welcome to CaafiCare!");
-        navigate("/");
-      }
+      toast.success("Verification code sent to your WhatsApp");
     } catch (error) {
-      toast.error(error.response?.data?.error || "Signup failed");
+      toast.error("Failed to send verification code. Please try again.");
     } finally {
       setLoading(false);
     }

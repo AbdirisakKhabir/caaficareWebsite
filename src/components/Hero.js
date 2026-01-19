@@ -38,14 +38,14 @@ const Hero = ({ onAppointmentClick, onNurseAppointmentClick }) => {
               </span>
             </div>
 
-            <h1 className="text-5xl lg:text-7xl font-black text-gray-900 font-poppins leading-[1.1] mb-6">
+            <h1 className="text-3xl lg:text-6xl font-black text-gray-900 font-poppins leading-[1.1] mb-6">
               Your Health, <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6CA9F5] to-blue-400">
                 Simplified.
               </span>
             </h1>
 
-            <p className="text-xl text-gray-500 font-medium leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
+            <p className="text-1xl text-gray-500 font-medium leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
               Experience the future of healthcare. Consult with top-tier doctors
               and book professional nursing care right from your home.
             </p>
@@ -88,7 +88,7 @@ const Hero = ({ onAppointmentClick, onNurseAppointmentClick }) => {
             <img
               src="/doctor-photo-3.avif"
               alt="Healthcare"
-              className="w-full h-[550px] object-cover rounded-[3rem] shadow-2xl rotate-2"
+              className="w-full h-[550px] object-cover rounded-[3rem] shadow-2xl"
             />
           </div>
         </div>

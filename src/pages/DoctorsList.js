@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { 
   HiVideoCamera, 
@@ -295,6 +296,16 @@ const DoctorsList = () => {
 };
 const DoctorCard = ({ doctor }) => {
   const [imageError, setImageError] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBookAppointment = () => {
+    navigate("/doctor-appointment", {
+      state: {
+        doctor: doctor,
+        appointmentType: "Video Consulting",
+      },
+    });
+  };
 
   const getTypeBadge = () => {
     if (doctor.type === "Video Consulting") {
@@ -456,7 +467,10 @@ const DoctorCard = ({ doctor }) => {
               </div>
             )} */}
             
-            <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+            <button 
+              onClick={handleBookAppointment}
+              className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md"
+            >
               Book Appointment
             </button>
           </div>

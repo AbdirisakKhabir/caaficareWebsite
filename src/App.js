@@ -16,7 +16,8 @@ import "./App.css";
 import DoctorsList from "./pages/DoctorsList";
 import NursesList from "./pages/NursesList";
 import HospitalsList from "./pages/HospitalsList";
-
+import VerifyUser from "./components/VerifyUser";
+import HospitalDoctors from "./pages/HospitalDoctors";
 function App() {
   const [isNurseApplyModalOpen, setIsNurseApplyModalOpen] = useState(false);
   const [isDoctorApplyModalOpen, setIsDoctorApplyModalOpen] = useState(false);
@@ -55,7 +56,7 @@ function AppContent({ onApplyNurseClick, onApplyDoctorClick }) {
   };
 
   const handleNurseAppointmentClick = () => {
-    navigate("/nurse-appointment");
+    navigate("/nurses-list");
   };
 
   const handleVideoConsultingClick = () => {
@@ -81,9 +82,9 @@ function AppContent({ onApplyNurseClick, onApplyDoctorClick }) {
                 onAppointmentClick={handleAppointmentClick}
                 onNurseAppointmentClick={handleNurseAppointmentClick}
               />
-              <DoctorsList />
+              {/* <DoctorsList />
               <NursesList />
-              <HospitalsList />
+              <HospitalsList /> */}
               <WhyChoose />
               <About />
               <Professions />
@@ -92,9 +93,13 @@ function AppContent({ onApplyNurseClick, onApplyDoctorClick }) {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify" element={<VerifyUser />} />
         <Route path="/appointment" element={<HospitalsList />} />
-        <Route path="/nurse-appointment" element={<NursesList />} />
+        <Route path="/doctor-appointment" element={<DoctorAppointment />} />
+        <Route path="/nurses-list" element={<NursesList />} />
+        <Route path="/nurse-appointment" element={<NurseAppointment />} />
         <Route path="/doctors" element={<DoctorsList />} />
+        <Route path="/hospital/:hospitalId/doctors" element={<HospitalDoctors />} />
       </Routes>
 
       <Footer />

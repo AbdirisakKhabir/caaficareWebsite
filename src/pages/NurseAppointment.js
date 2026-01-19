@@ -1,21 +1,125 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import {
+  HiOutlineCalendar,
+  HiOutlineUser,
+  HiX,
+  HiChevronLeft,
+  HiChevronRight,
+} from "react-icons/hi";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const NurseAppointment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { nurse } = location.state || {};
+  
   const [loading, setLoading] = useState(false);
   const [nurses, setNurses] = useState([]);
   const [filteredNurses, setFilteredNurses] = useState([]);
   const [services, setServices] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [currentDateIndex, setCurrentDateIndex] = useState(0);
 
   const [selectedNurse, setSelectedNurse] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+
+  // Generate available dates (Today, Tomorrow, and next 7 days)
+  const generateDates = () => {
+    const dates = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 10; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      dates.push(date);
+    }
+    
+    return dates;
+  };
+
+  const availableDates = generateDates();
+
+  // Generate time slots
+  const generateTimeSlots = () => {
+    const slots = {
+      morning: [],
+      afternoon: [],
+      evening: [],
+    };
+
+    // Morning slots (8:00 AM - 11:45 AM)
+    for (let hour = 8; hour < 12; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.morning.push({
+          time,
+          display: formatTime(hour, minute),
+          available: Math.random() > 0.3,
+        });
+      }
+    }
+
+    // Afternoon slots (12:00 PM - 3:45 PM)
+    for (let hour = 12; hour < 16; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.afternoon.push({
+          time,
+          display: formatTime(hour, minute),
+          available: Math.random() > 0.3,
+        });
+      }
+    }
+
+    // Evening slots (4:00 PM - 8:45 PM)
+    for (let hour = 16; hour < 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.evening.push({
+          time,
+          display: formatTime(hour, minute),
+          available: Math.random() > 0.3,
+        });
+      }
+    }
+
+    return slots;
+  };
+
+  const formatTime = (hour, minute) => {
+    const period = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${displayHour}:${minute.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const [timeSlots] = useState(generateTimeSlots());
+
+  // Get available slots count for a date
+  const getAvailableSlotsCount = (dateIndex) => {
+    const allSlots = [
+      ...timeSlots.morning,
+      ...timeSlots.afternoon,
+      ...timeSlots.evening,
+    ];
+    return allSlots.filter((slot) => slot.available).length;
+  };
+
+  // Format date display
+  const formatDateDisplay = (date, index) => {
+    if (index === 0) return "Today";
+    if (index === 1) return "Tomorrow";
+    
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+  };
 
   const [formData, setFormData] = useState({
     patientName: "",
@@ -25,6 +129,7 @@ const NurseAppointment = () => {
     appointmentType: "Nursing",
     appointmentDate: "",
     shift: "",
+    appointmentTime: "",
     address: "",
     location: "",
     nurse_id: "",
@@ -32,6 +137,18 @@ const NurseAppointment = () => {
     service_id: "",
     status: "Scheduled",
   });
+
+  // Pre-fill form if nurse is passed from NursesList
+  useEffect(() => {
+    if (nurse) {
+      setFormData((prev) => ({
+        ...prev,
+        nurse_id: nurse.id.toString(),
+        location: nurse.district || nurse.city || nurse.location || "",
+      }));
+      setSelectedNurse(nurse);
+    }
+  }, [nurse]);
 
   // Data Fetching
   useEffect(() => {
@@ -91,10 +208,34 @@ const NurseAppointment = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleDateSelect = (date, index) => {
+    setSelectedDate(date);
+    setCurrentDateIndex(index);
+    const dateString = date.toISOString().split("T")[0];
+    setFormData((prev) => ({ ...prev, appointmentDate: dateString }));
+  };
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+    setFormData((prev) => ({ ...prev, appointmentTime: time }));
+  };
+
+  const navigateDates = (direction) => {
+    if (direction === "prev" && currentDateIndex > 0) {
+      setCurrentDateIndex(currentDateIndex - 1);
+    } else if (direction === "next" && currentDateIndex < availableDates.length - 3) {
+      setCurrentDateIndex(currentDateIndex + 1);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.service_id || !formData.nurse_id) {
       toast.warn("Please select a service and a nurse");
+      return;
+    }
+    if (!selectedDate || !selectedTime) {
+      toast.warn("Please select a date and time");
       return;
     }
 
@@ -255,27 +396,129 @@ const NurseAppointment = () => {
                       </select>
                     </FormRow>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="date"
-                        name="appointmentDate"
-                        value={formData.appointmentDate}
-                        onChange={handleChange}
-                        required
-                        className="input-field"
-                      />
-                      <select
-                        name="shift"
-                        value={formData.shift}
-                        onChange={handleChange}
-                        required
-                        className="input-field"
-                      >
-                        <option value="">Select Shift</option>
-                        <option value="Morning">Morning (8AM-2PM)</option>
-                        <option value="Afternoon">Afternoon (2PM-8PM)</option>
-                        <option value="Night">Night (8PM-8AM)</option>
-                      </select>
+                    {/* Schedule Selection - New Design */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-blue-600">
+                        <HiOutlineCalendar className="w-5 h-5" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">
+                          Select Date & Time
+                        </span>
+                      </div>
+
+                      {/* Date Selection */}
+                      <div className="bg-white rounded-2xl border-2 border-gray-100 p-6">
+                        {/* Logo */}
+                        <div className="flex items-center justify-between mb-6">
+                         
+                         
+                        </div>
+
+                        {/* Date Navigation */}
+                        <div className="flex items-center justify-between mb-4">
+                          <button
+                            type="button"
+                            onClick={() => navigateDates("prev")}
+                            disabled={currentDateIndex === 0}
+                            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <HiChevronLeft className="w-5 h-5 text-blue-600" />
+                          </button>
+
+                          <div className="flex items-center gap-3 flex-1 justify-center">
+                            {availableDates.slice(currentDateIndex, currentDateIndex + 3).map((date, idx) => {
+                              const actualIndex = currentDateIndex + idx;
+                              const isSelected = selectedDate && selectedDate.getTime() === date.getTime();
+                              return (
+                                <button
+                                  key={actualIndex}
+                                  type="button"
+                                  onClick={() => handleDateSelect(date, actualIndex)}
+                                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all min-w-[120px] ${
+                                    isSelected
+                                      ? "border-blue-500 bg-blue-50"
+                                      : "border-gray-200 hover:border-blue-300"
+                                  }`}
+                                >
+                                  <span className={`text-sm font-bold mb-1 ${isSelected ? "text-blue-600" : "text-gray-700"}`}>
+                                    {formatDateDisplay(date, actualIndex)}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {getAvailableSlotsCount(actualIndex)} Available
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => navigateDates("next")}
+                            disabled={currentDateIndex >= availableDates.length - 3}
+                            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <HiChevronRight className="w-5 h-5 text-blue-600" />
+                          </button>
+                        </div>
+
+                        {/* Time Slots */}
+                        {selectedDate && (
+                          <div className="mt-6 max-h-96 overflow-y-auto">
+                            {/* Afternoon Section */}
+                            <div className="mb-6">
+                              <div className="flex items-center gap-2 mb-4">
+                                <span className="text-yellow-500">☀️</span>
+                                <h4 className="text-sm font-bold text-gray-700">Afternoon</h4>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2">
+                                {timeSlots.afternoon.map((slot, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleTimeSelect(slot.time)}
+                                    disabled={!slot.available}
+                                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                                      selectedTime === slot.time
+                                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                                        : slot.available
+                                        ? "border-gray-200 hover:border-blue-300 text-gray-700"
+                                        : "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                    }`}
+                                  >
+                                    {slot.display}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Evening Section */}
+                            <div>
+                              <div className="flex items-center gap-2 mb-4">
+                                <span className="text-blue-500">🌙</span>
+                                <h4 className="text-sm font-bold text-gray-700">Evening</h4>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2">
+                                {timeSlots.evening.map((slot, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleTimeSelect(slot.time)}
+                                    disabled={!slot.available}
+                                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                                      selectedTime === slot.time
+                                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                                        : slot.available
+                                        ? "border-gray-200 hover:border-blue-300 text-gray-700"
+                                        : "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                    }`}
+                                  >
+                                    {slot.display}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <textarea
@@ -290,8 +533,8 @@ const NurseAppointment = () => {
 
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-4 bg-[#6CA9F5] text-white rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 text-lg"
+                      disabled={isSubmitting || !selectedDate || !selectedTime}
+                      className="w-full py-4 bg-[#6CA9F5] text-white rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                     >
                       {isSubmitting ? "Processing..." : "Confirm Nurse Booking"}
                     </button>

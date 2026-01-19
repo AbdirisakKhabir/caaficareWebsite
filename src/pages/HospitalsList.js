@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { 
   HiLocationMarker,
   HiPhone,
@@ -278,7 +279,10 @@ const HospitalsList = () => {
 
 const HospitalCard = ({ hospital }) => {
   const [imageError, setImageError] = useState(false);
-
+  const navigate = useNavigate();
+  const handleViewDetails = () => {
+    navigate(`/hospital/${hospital.id}/doctors`);
+  };
   return (
     <div className="group relative">
       {/* Card Container - Different style from Doctors/Nurses */}
@@ -347,10 +351,14 @@ const HospitalCard = ({ hospital }) => {
 
           {/* Action Button */}
           <div className="pt-3 border-t border-gray-100">
-            <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
-              View Details
+            <button 
+              onClick={handleViewDetails}
+              className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-700 hover:to-blue-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md"
+            >
+              Continue
             </button>
           </div>
+
         </div>
       </div>
 

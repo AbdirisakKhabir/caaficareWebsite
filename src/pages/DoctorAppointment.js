@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -10,6 +10,9 @@ import {
   HiOutlineClock,
   HiOutlineUser,
   HiCheckCircle,
+  HiX,
+  HiChevronLeft,
+  HiChevronRight,
 } from "react-icons/hi";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -51,12 +54,109 @@ const CustomSelect = ({ label, children, ...props }) => (
 
 const DoctorAppointment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { doctor, appointmentType } = location.state || {};
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hospitals, setHospitals] = useState([]);
   const [specialties, setSpecialties] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [fetchingDoctors, setFetchingDoctors] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [currentDateIndex, setCurrentDateIndex] = useState(0);
+
+  // Generate available dates (Today, Tomorrow, and next 7 days)
+  const generateDates = () => {
+    const dates = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 10; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      dates.push(date);
+    }
+    
+    return dates;
+  };
+
+  const availableDates = generateDates();
+
+  // Generate time slots
+  const generateTimeSlots = () => {
+    const slots = {
+      morning: [],
+      afternoon: [],
+      evening: [],
+    };
+
+    // Morning slots (11:00 AM - 11:45 AM)
+    for (let hour = 11; hour < 12; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.morning.push({
+          time,
+          display: formatTime(hour, minute),
+          available: Math.random() > 0.3, // Random availability for demo
+        });
+      }
+    }
+
+    // Afternoon slots (12:00 PM - 3:45 PM)
+    for (let hour = 12; hour < 16; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.afternoon.push({
+          time,
+          display: formatTime(hour, minute),
+          available: Math.random() > 0.3,
+        });
+      }
+    }
+
+    // Evening slots (4:00 PM - 9:45 PM)
+    for (let hour = 16; hour < 22; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        slots.evening.push({
+          time,
+          display: formatTime(hour, minute),
+          available: Math.random() > 0.3,
+        });
+      }
+    }
+
+    return slots;
+  };
+
+  const formatTime = (hour, minute) => {
+    const period = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${displayHour}:${minute.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const [timeSlots] = useState(generateTimeSlots());
+
+  // Get available slots count for a date
+  const getAvailableSlotsCount = (dateIndex) => {
+    const allSlots = [
+      ...timeSlots.morning,
+      ...timeSlots.afternoon,
+      ...timeSlots.evening,
+    ];
+    return allSlots.filter((slot) => slot.available).length;
+  };
+
+  // Format date display
+  const formatDateDisplay = (date, index) => {
+    if (index === 0) return "Today";
+    if (index === 1) return "Tomorrow";
+    
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+  };
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
@@ -83,21 +183,31 @@ const DoctorAppointment = () => {
     checkAuthAndFetch();
   }, [navigate]);
 
+  // Pre-fill form if doctor is passed from DoctorsList
+  useEffect(() => {
+    if (doctor) {
+      formik.setFieldValue("doctor_id", doctor.id);
+      formik.setFieldValue("appointmentType", appointmentType || "Video Consulting");
+      formik.setFieldValue("hospital_id", doctor.hospital_id || "");
+      formik.setFieldValue("specialty", doctor.profession || "");
+    }
+  }, [doctor, appointmentType]);
+
   const formik = useFormik({
     initialValues: {
       patientName: "",
       patientPhone: "",
       patientAge: "",
       patientGender: "",
-      appointmentType: "",
+      appointmentType: appointmentType || "",
       appointmentDate: "",
       shift: "",
       appointmentTime: "",
       status: "Scheduled",
       customer_id: "",
-      doctor_id: "",
-      hospital_id: "",
-      specialty: "",
+      doctor_id: doctor?.id || "",
+      hospital_id: doctor?.hospital_id || "",
+      specialty: doctor?.profession || "",
       notes: "",
     },
     validationSchema: Yup.object({
@@ -109,7 +219,7 @@ const DoctorAppointment = () => {
       hospital_id: Yup.string().required("Required"),
       appointmentDate: Yup.date().required("Required"),
       doctor_id: Yup.string().required("Required"),
-      shift: Yup.string().required("Required"),
+      appointmentTime: Yup.string().required("Required"),
     }),
     onSubmit: async (values) => {
       setIsSubmitting(true);
@@ -135,34 +245,27 @@ const DoctorAppointment = () => {
     },
   });
 
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      if (!formik.values.appointmentType) return;
-      setFetchingDoctors(true);
-      try {
-        const params = new URLSearchParams({
-          appointmentType: formik.values.appointmentType,
-          hospitalId: formik.values.hospital_id,
-          specialty: formik.values.specialty,
-        });
-        const res = await axios.get(
-          `https://app.caaficare.so/api/appointment_doctors?${params.toString()}`,
-        );
-        setDoctors(res.data.data || []);
-      } catch (error) {
-        setDoctors([]);
-      } finally {
-        setFetchingDoctors(false);
-      }
-    };
-    fetchDoctors();
-  }, [
-    formik.values.appointmentType,
-    formik.values.hospital_id,
-    formik.values.specialty,
-  ]);
+  const selectedDoctor = doctor || doctors.find((d) => d.id == formik.values.doctor_id);
 
-  const selectedDoctor = doctors.find((d) => d.id == formik.values.doctor_id);
+  const handleDateSelect = (date, index) => {
+    setSelectedDate(date);
+    setCurrentDateIndex(index);
+    const dateString = date.toISOString().split("T")[0];
+    formik.setFieldValue("appointmentDate", dateString);
+  };
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+    formik.setFieldValue("appointmentTime", time);
+  };
+
+  const navigateDates = (direction) => {
+    if (direction === "prev" && currentDateIndex > 0) {
+      setCurrentDateIndex(currentDateIndex - 1);
+    } else if (direction === "next" && currentDateIndex < availableDates.length - 3) {
+      setCurrentDateIndex(currentDateIndex + 1);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -220,15 +323,9 @@ const DoctorAppointment = () => {
                             Consultation Fee
                           </span>
                           <span className="text-2xl font-black">
-                            ${selectedDoctor.card_price}
+                            ${selectedDoctor.card_price || selectedDoctor.appointment_price}
                           </span>
                         </div>
-                      </div>
-                    )}
-
-                    {!selectedDoctor && (
-                      <div className="mt-8 text-blue-100/50 text-sm">
-                        Select a doctor to see details
                       </div>
                     )}
                   </div>
@@ -240,15 +337,6 @@ const DoctorAppointment = () => {
                     onSubmit={formik.handleSubmit}
                     className="space-y-8 text-left"
                   >
-                    <div className="mb-8">
-                      <h3 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
-                        Schedule Visit
-                      </h3>
-                      <p className="text-gray-400 text-sm">
-                        Provide information for the clinical record.
-                      </p>
-                    </div>
-
                     {/* Patient Identity */}
                     <div className="space-y-4">
                       <div className="flex items-center gap-2 text-blue-600">
@@ -293,89 +381,142 @@ const DoctorAppointment = () => {
                       </div>
                     </div>
 
-                    {/* Consultation Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-blue-50/30 p-8 rounded-2xl border border-blue-50">
-                      <CustomSelect
-                        label="Consultation Type"
-                        {...formik.getFieldProps("appointmentType")}
-                      >
-                        <option value="">Select Visit Format</option>
-                        <option value="Video Consulting">
-                          Video Consultation
-                        </option>
-                        <option value="Appointment">
-                          In-Person Hospital Visit
-                        </option>
-                      </CustomSelect>
-                      <CustomSelect
-                        label="Primary Hospital"
-                        {...formik.getFieldProps("hospital_id")}
-                      >
-                        <option value="">Select Medical Center</option>
-                        {hospitals.map((h) => (
-                          <option key={h.id} value={h.id}>
-                            {h.name}
-                          </option>
-                        ))}
-                      </CustomSelect>
-                      <CustomSelect
-                        label="Specialty"
-                        {...formik.getFieldProps("specialty")}
-                      >
-                        <option value="">General Physician</option>
-                        {specialties.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </CustomSelect>
-                      <CustomSelect
-                        label="Choose Doctor"
-                        {...formik.getFieldProps("doctor_id")}
-                      >
-                        <option value="">
-                          {fetchingDoctors
-                            ? "Updating staff list..."
-                            : "Select Doctor"}
-                        </option>
-                        {doctors.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            Dr. {d.name} (${d.card_price})
-                          </option>
-                        ))}
-                      </CustomSelect>
-                    </div>
-
-                    {/* Time Selection */}
+                    {/* Schedule Selection - New Design */}
                     <div className="space-y-4">
                       <div className="flex items-center gap-2 text-blue-600">
                         <HiOutlineCalendar className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-widest">
-                          Date & Slot Allocation
+                          Select Date & Time
                         </span>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <CustomInput
-                          label="Appointment Date"
-                          type="date"
-                          {...formik.getFieldProps("appointmentDate")}
-                        />
-                        <CustomSelect
-                          label="Preferred Shift"
-                          {...formik.getFieldProps("shift")}
-                        >
-                          <option value="">Choose Shift</option>
-                          <option value="Morning">Morning</option>
-                          <option value="Afternoon">Afternoon</option>
-                        </CustomSelect>
-                        <CustomInput
-                          label="Exact Time"
-                          type="time"
-                          {...formik.getFieldProps("appointmentTime")}
-                        />
+
+                      {/* Date Selection */}
+                      <div className="bg-white rounded-2xl border-2 border-gray-100 p-6">
+                        {/* Logo */}
+                        <div className="flex items-center justify-between mb-6">
+                          {/* <img
+                            src="/caafi.png"
+                            alt="CAAFICare Logo"
+                            className="h-12 w-auto"
+                          /> */}
+                          {/* <button
+                            type="button"
+                            onClick={() => navigate("/")}
+                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                          >
+                            <HiX className="w-6 h-6" />
+                          </button> */}
+                        </div>
+
+                        {/* Date Navigation */}
+                        <div className="flex items-center justify-between mb-4">
+                          <button
+                            type="button"
+                            onClick={() => navigateDates("prev")}
+                            disabled={currentDateIndex === 0}
+                            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <HiChevronLeft className="w-5 h-5 text-blue-600" />
+                          </button>
+
+                          <div className="flex items-center gap-3 flex-1 justify-center">
+                            {availableDates.slice(currentDateIndex, currentDateIndex + 3).map((date, idx) => {
+                              const actualIndex = currentDateIndex + idx;
+                              const isSelected = selectedDate && selectedDate.getTime() === date.getTime();
+                              return (
+                                <button
+                                  key={actualIndex}
+                                  type="button"
+                                  onClick={() => handleDateSelect(date, actualIndex)}
+                                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all min-w-[120px] ${
+                                    isSelected
+                                      ? "border-blue-500 bg-blue-50"
+                                      : "border-gray-200 hover:border-blue-300"
+                                  }`}
+                                >
+                                  <span className={`text-sm font-bold mb-1 ${isSelected ? "text-blue-600" : "text-gray-700"}`}>
+                                    {formatDateDisplay(date, actualIndex)}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {getAvailableSlotsCount(actualIndex)} Available
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => navigateDates("next")}
+                            disabled={currentDateIndex >= availableDates.length - 3}
+                            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <HiChevronRight className="w-5 h-5 text-blue-600" />
+                          </button>
+                        </div>
+
+                        {/* Time Slots */}
+                        {selectedDate && (
+                          <div className="mt-6 max-h-96 overflow-y-auto">
+                            {/* Afternoon Section */}
+                            <div className="mb-6">
+                              <div className="flex items-center gap-2 mb-4">
+                                <span className="text-yellow-500">☀️</span>
+                                <h4 className="text-sm font-bold text-gray-700">Afternoon</h4>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2">
+                                {timeSlots.afternoon.map((slot, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleTimeSelect(slot.time)}
+                                    disabled={!slot.available}
+                                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                                      selectedTime === slot.time
+                                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                                        : slot.available
+                                        ? "border-gray-200 hover:border-blue-300 text-gray-700"
+                                        : "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                    }`}
+                                  >
+                                    {slot.display}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Evening Section */}
+                            <div>
+                              <div className="flex items-center gap-2 mb-4">
+                                <span className="text-blue-500">🌙</span>
+                                <h4 className="text-sm font-bold text-gray-700">Evening</h4>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2">
+                                {timeSlots.evening.map((slot, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleTimeSelect(slot.time)}
+                                    disabled={!slot.available}
+                                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                                      selectedTime === slot.time
+                                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                                        : slot.available
+                                        ? "border-gray-200 hover:border-blue-300 text-gray-700"
+                                        : "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed"
+                                    }`}
+                                  >
+                                    {slot.display}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
+                    {/* Notes */}
                     <div className="flex flex-col items-start space-y-1.5">
                       <label className="text-[11px] font-bold text-gray-500 uppercase ml-1 tracking-wider text-left">
                         Clinical Notes
@@ -390,8 +531,8 @@ const DoctorAppointment = () => {
 
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-xl transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-3 disabled:opacity-50"
+                      disabled={isSubmitting || !selectedDate || !selectedTime}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-xl transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
                         <>

@@ -14,6 +14,8 @@ import {
   HiPhone,
   HiDocumentText,
 } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
+
 
 const NursesList = () => {
   const [nurses, setNurses] = useState([]);
@@ -296,6 +298,16 @@ const NursesList = () => {
 };
 const NurseCard = ({ nurse }) => {
   const [imageError, setImageError] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBookNurse = () => {
+    navigate("/nurse-appointment", {
+      state: {
+        nurse: nurse,
+      },
+    });
+  };
+
 
   const isAvailable = nurse.status === "Active" || nurse.status === "Approved";
 
@@ -389,7 +401,10 @@ const NurseCard = ({ nurse }) => {
           <div className="pt-4 border-t border-gray-100 space-y-2">
            
             
-            <button className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md">
+          <button 
+              onClick={handleBookNurse}
+              className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-md"
+            >
               Book Nurse
             </button>
           </div>

@@ -73,19 +73,19 @@ const Header = ({
     },
     {
       title: "Video Consulting",
-      subtitle: "Find a doctor",
+      subtitle: "Find a Specialist",
       onClick: onVideoConsultingClick,
     
     },
     {
       title: "Hospitals",
-      subtitle: "Find a hospital",
+      subtitle: "Find a Hospitals & Clinics",
       onClick: onAppointmentClick,
      
     },
     {
       title: "Nurses",
-      subtitle: "Find a nurse",
+      subtitle: "Find a Your Nurse",
       onClick: onNurseAppointmentClick,
      
     },

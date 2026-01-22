@@ -8,34 +8,37 @@ const PaymentModal = ({ isOpen, onClose, appointmentPrice, onPaymentComplete }) 
   // Payment methods configuration
   const paymentMethods = [
     {
-      id: "zaad",
-      name: "ZAAD",
-      phone: "456440",
-    
-      image: "/zaadLogo.png",
-      description: "Somaliland Mobile Money",
-    },
-    {
-      id: "evc",
-      name: "EVC Plus",
-      phone: "456440",
-      
-      image: "/evcPlus.jpg",
+      id: "merchant",
+      name: "Merchant",
+      phone: "737721",
+      ussdPrefix: "*789*",
+      color: "from-green-500 to-green-600",
+      image: "/merchant-logo.png",
       description: "Somalia Mobile Money",
     },
     {
       id: "edahab",
-      name: "EDAHAB",
-      phone: "456440",
-      
+      name: "E-Dahab",
+      phone: "622222154",
+      ussdPrefix: "*110*",
+      color: "from-purple-500 to-purple-600",
       image: "/edahab.jpg",
+      description: "Somalia Mobile Money",
+    },
+    {
+      id: "evc",
+      name: "EVC",
+      phone: "0619002269",
+      ussdPrefix: "*712*",
+      color: "from-blue-500 to-blue-600",
+      image: "/evcPlus.jpg",
       description: "Somalia Mobile Money",
     },
   ];
 
   // Generate USSD code
-  const generateUSSDCode = (phone) => {
-    return `*789*${phone}*${appointmentPrice}#`;
+  const generateUSSDCode = (method) => {
+    return `${method.ussdPrefix}${method.phone}*${appointmentPrice || "0"}#`;
   };
 
   // Copy to clipboard
@@ -98,7 +101,7 @@ const PaymentModal = ({ isOpen, onClose, appointmentPrice, onPaymentComplete }) 
             </h3>
             
             {paymentMethods.map((method, index) => {
-              const ussdCode = generateUSSDCode(method.phone);
+              const ussdCode = generateUSSDCode(method);
               const isCopied = copiedIndex === index;
 
               return (

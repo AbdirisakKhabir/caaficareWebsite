@@ -25,7 +25,7 @@ const validationSchema = yup.object({
 const VerifyUser = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { phone, userType, userTypeLabel, code, isNewUser, existingUserData } = 
+  const { phone, userType, userTypeLabel, code, isNewUser, existingUserData, full_name, countryCode } = 
     location.state || {};
 
   const [loading, setLoading] = useState(false);
@@ -69,26 +69,33 @@ const VerifyUser = () => {
     }
   }, [countdown]);
 
+
   // Store user data in localStorage
   const storeUserData = (userData) => {
     try {
-      const storeData = {
+      // Normalize user data to ensure full_name is available
+      // Handle both fullName (camelCase from API) and full_name (snake_case)
+      const normalizedData = {
         ...userData,
+        // Ensure full_name exists - check both camelCase and snake_case
+        full_name: userData.full_name || userData.fullName || userData.name || `Customer ${phone.slice(-4)}`,
         userType: userType,
         verified: true,
         lastLogin: new Date().toISOString(),
         phone: phone,
+        // Ensure id is available
+        id: userData.id,
       };
 
       // Store all user data
-      localStorage.setItem("customer", JSON.stringify(storeData));
+      localStorage.setItem("customer", JSON.stringify(normalizedData));
       localStorage.setItem("userType", userType);
       localStorage.setItem("userTypeLabel", userTypeLabel);
       localStorage.setItem("phone", phone);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("token", userData.token || "");
-      localStorage.setItem("userId", userData.id?.toString() || "");
-      localStorage.setItem("userName", userData.name || userData.full_name || "");
+      localStorage.setItem("userId", normalizedData.id?.toString() || "");
+      localStorage.setItem("userName", normalizedData.full_name || "");
       localStorage.setItem("loginTimestamp", new Date().toISOString());
 
       // Trigger storage event for Header update
@@ -106,7 +113,7 @@ const VerifyUser = () => {
       throw error;
     }
   };
-
+  // Create new user
   // Create new user
   const createNewUser = async () => {
     let endpoint, payload;
@@ -140,11 +147,16 @@ const VerifyUser = () => {
         };
         break;
       case "customer":
-        endpoint = "https://app.caaficare.so/api/customers";
+        endpoint = "https://app.caaficare.so/api/customer";
+        // Match API exactly - only send full_name and phone
         payload = {
           phone,
-          full_name: `Customer ${phone.slice(-4)}`,
+          full_name: full_name || `Customer ${phone.slice(-4)}`, // Use full_name from Signup if available
         };
+        // Note: If you need to store countryCode, you'll need to:
+        // 1. Add countryCode field to your Prisma schema
+        // 2. Update the API to accept countryCode
+        // 3. Then add: countryCode: countryCode || "+252"
         break;
       default:
         throw new Error("Invalid user type");
@@ -159,8 +171,18 @@ const VerifyUser = () => {
     return response.data.data || response.data;
   };
 
+
   // Login existing user
   const loginExistingUser = async () => {
+    // If we already have existingUserData from Login page, use it first
+    if (existingUserData) {
+      // Normalize existingUserData to ensure full_name is available
+      return {
+        ...existingUserData,
+        full_name: existingUserData.full_name || existingUserData.fullName || existingUserData.name,
+      };
+    }
+
     let endpoint;
 
     switch (userType) {
@@ -177,10 +199,21 @@ const VerifyUser = () => {
         try {
           const response = await axios.post(
             "https://app.caaficare.so/api/customerLogin",
-            { phone: phone }
+            { 
+              phone: phone,
+              countryCode: countryCode || "+252"
+            }
           );
-          return response.data.user || response.data.data;
+          // Normalize the response - API returns fullName (camelCase), convert to full_name
+          const userData = response.data.user || response.data.data || response.data;
+          return {
+            ...userData,
+            full_name: userData.full_name || userData.fullName || userData.name,
+            id: userData.id,
+            phone: userData.phone || phone,
+          };
         } catch (error) {
+          // Fallback to GET endpoint if POST fails
           endpoint = `https://app.caaficare.so/api/customers/phone/${phone}`;
         }
         break;
@@ -188,13 +221,22 @@ const VerifyUser = () => {
         throw new Error("Invalid user type");
     }
 
-    const response = await axios.get(endpoint);
+    // Only use GET endpoint if POST didn't work (for non-customer types or fallback)
+    if (endpoint) {
+      const response = await axios.get(endpoint);
 
-    if (!response.data.success) {
-      throw new Error("User not found");
+      if (!response.data.success) {
+        throw new Error("User not found");
+      }
+
+      const userData = response.data.data || existingUserData;
+      return {
+        ...userData,
+        full_name: userData.full_name || userData.fullName || userData.name,
+      };
     }
 
-    return response.data.data || existingUserData;
+    return existingUserData;
   };
 
   // Verify code and handle user
@@ -215,6 +257,15 @@ const VerifyUser = () => {
         userData = await loginExistingUser();
       }
 
+      // If login failed but we have existingUserData, use it
+      if (!userData && existingUserData) {
+        userData = existingUserData;
+      }
+
+      if (!userData) {
+        throw new Error("Failed to retrieve user data");
+      }
+
       await storeUserData(userData);
 
       navigate("/");
@@ -222,6 +273,7 @@ const VerifyUser = () => {
       console.error("Verification Error:", error);
       toast.error(
         error.response?.data?.message ||
+        error.response?.data?.error ||
         error.message ||
         "Could not complete verification."
       );
@@ -301,6 +353,30 @@ const VerifyUser = () => {
     }
   };
 
+  // Determine button text based on context
+  const getButtonText = () => {
+    if (loading) return "";
+    
+    // Priority 1: If we have existingUserData, it's definitely a login (even if isNewUser is incorrectly set)
+    if (existingUserData) {
+      return "Verify & Login";
+    }
+    
+    // Priority 2: If isNewUser is explicitly false, it's a login
+    if (isNewUser === false) {
+      return "Verify & Login";
+    }
+    
+    // Priority 3: If isNewUser is true, it's account creation
+    if (isNewUser === true) {
+      return "Create Account";
+    }
+    
+    // Default: If isNewUser is undefined/null, check if we have existingUserData
+    // If no existingUserData, assume it's a new account
+    return existingUserData ? "Verify & Login" : "Create Account";
+  };
+
   if (!phone) {
     return null;
   }
@@ -329,7 +405,7 @@ const VerifyUser = () => {
                 {userTypeLabel || "User Verification"}
               </p>
               <p className="text-sm text-gray-600 font-medium">
-                {phone ? `+${phone}` : "Phone number"}
+                {phone ? `${phone}` : "Phone number"}
               </p>
               <p className="text-xs text-gray-500 italic mt-1">
                 {isNewUser ? "New Account" : "Existing Account"}
@@ -413,7 +489,7 @@ const VerifyUser = () => {
               ) : (
                 <>
                   <HiUser className="w-5 h-5" />
-                  <span>{isNewUser ? "Create Account" : "Verify & Login"}</span>
+                  <span>{getButtonText()}</span>
                 </>
               )}
             </button>

@@ -18,6 +18,7 @@ import NursesList from "./pages/NursesList";
 import HospitalsList from "./pages/HospitalsList";
 import VerifyUser from "./components/VerifyUser";
 import HospitalDoctors from "./pages/HospitalDoctors";
+import AppointmentHistory from "./pages/AppointmentHistory";
 function App() {
   const [isNurseApplyModalOpen, setIsNurseApplyModalOpen] = useState(false);
   const [isDoctorApplyModalOpen, setIsDoctorApplyModalOpen] = useState(false);
@@ -100,6 +101,7 @@ function AppContent({ onApplyNurseClick, onApplyDoctorClick }) {
         <Route path="/nurse-appointment" element={<NurseAppointment />} />
         <Route path="/doctors" element={<DoctorsList />} />
         <Route path="/hospital/:hospitalId/doctors" element={<HospitalDoctors />} />
+        <Route path="/appointments/history" element={<AppointmentHistory />} />
       </Routes>
 
       <Footer />

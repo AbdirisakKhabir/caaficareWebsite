@@ -9,7 +9,8 @@ import {
   HiOfficeBuilding,
   HiUserGroup,
   HiBriefcase,
-  HiInformationCircle
+  HiInformationCircle,
+  HiClock
 } from "react-icons/hi";
 
 const Header = ({
@@ -69,13 +70,13 @@ const Header = ({
       title: "Home",
       subtitle: "Back to home",
       href: "/",
-     
+      
     },
     {
       title: "Video Consulting",
       subtitle: "Find a Specialist",
       onClick: onVideoConsultingClick,
-    
+     
     },
     {
       title: "Hospitals",
@@ -87,19 +88,20 @@ const Header = ({
       title: "Nurses",
       subtitle: "Find a Your Nurse",
       onClick: onNurseAppointmentClick,
-     
+      
     },
+   
     {
       title: "Join Our Team",
       subtitle: "Apply as specialist",
       isDropdown: true,
-   
+    
     },
     {
       title: "About Us",
       subtitle: "Our mission",
       href: "/#about-us",
-      
+   
     },
   ];
 
@@ -239,7 +241,7 @@ const Header = ({
                     </p>
                   </div>
                   <Link
-                    to="/appointments"
+                    to="/appointments/history"
                     onClick={() => setIsUserMenuOpen(false)}
                     className="block px-3 py-2.5 text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all"
                   >

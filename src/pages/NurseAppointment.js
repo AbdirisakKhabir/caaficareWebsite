@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import PaymentModal from "../components/PaymentModal";
 import {
   HiOutlineCalendar,
   HiOutlineUser,
@@ -26,9 +27,10 @@ const NurseAppointment = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [currentDateIndex, setCurrentDateIndex] = useState(0);
-
   const [selectedNurse, setSelectedNurse] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [pendingAppointmentData, setPendingAppointmentData] = useState(null);
 
   // Generate available dates (Today, Tomorrow, and next 7 days)
   const generateDates = () => {
@@ -239,14 +241,25 @@ const NurseAppointment = () => {
       return;
     }
 
+    // Show payment modal instead of submitting directly
+    setPendingAppointmentData(formData);
+    setShowPaymentModal(true);
+  };
+
+  // Handle payment completion - actually submit the appointment
+  const handlePaymentComplete = async () => {
+    if (!pendingAppointmentData) return;
+
     setIsSubmitting(true);
     try {
       const response = await axios.post(
         "https://app.caaficare.so/api/nurses_appointment",
-        formData,
+        pendingAppointmentData,
       );
       if (response.data.success) {
         setIsSuccess(true);
+        setShowPaymentModal(false);
+        setPendingAppointmentData(null);
         setTimeout(() => {
           navigate("/");
         }, 3000);
@@ -257,6 +270,9 @@ const NurseAppointment = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Get appointment price from selected service
+  const appointmentPrice = selectedService?.price || "0";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -407,12 +423,6 @@ const NurseAppointment = () => {
 
                       {/* Date Selection */}
                       <div className="bg-white rounded-2xl border-2 border-gray-100 p-6">
-                        {/* Logo */}
-                        <div className="flex items-center justify-between mb-6">
-                         
-                         
-                        </div>
-
                         {/* Date Navigation */}
                         <div className="flex items-center justify-between mb-4">
                           <button
@@ -586,6 +596,17 @@ const NurseAppointment = () => {
       </div>
 
       <Footer />
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => {
+          setShowPaymentModal(false);
+          setPendingAppointmentData(null);
+        }}
+        appointmentPrice={appointmentPrice}
+        onPaymentComplete={handlePaymentComplete}
+      />
 
       <style jsx>{`
         .input-field {

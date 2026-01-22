@@ -385,71 +385,51 @@ const DoctorCard = ({ doctor }) => {
           )}
 
           {/* Details Section */}
-          <div className="space-y-2 mb-4 flex-1">
+                   {/* Details Section */}
+                   <div className="space-y-2 mb-4 flex-1">
+            {/* Hospital */}
+            {doctor.hospital?.name && (
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiOfficeBuilding className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <span className="line-clamp-1">Hospital: {doctor.hospital.name}</span>
+              </div>
+            )}
+
+            {/* Specialty */}
+            {doctor.profession && (
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiBriefcase className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <span className="line-clamp-1">Specialty: {doctor.profession}</span>
+              </div>
+            )}
+
+            {/* Language Known */}
+            {doctor.languages && (
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiGlobeAlt className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <span className="line-clamp-1">Language Known: {doctor.languages}</span>
+              </div>
+            )}
+
+            {/* Standard Charges */}
+            {doctor.card_price && (
+              <div className="flex items-start gap-2 text-xs text-gray-600">
+                <HiCurrencyDollar className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <span className="line-clamp-1">Standard Charges: ${doctor.card_price}</span>
+              </div>
+            )}
+
+            {/* Years of Experience */}
             {doctor.job_experience && (
               <div className="flex items-start gap-2 text-xs text-gray-600">
                 <HiBriefcase className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
                 <span className="line-clamp-1">Years of Experience: {doctor.job_experience}</span>
               </div>
             )}
-
-            {doctor.languages && (
-              <div className="flex items-start gap-2 text-xs text-gray-600">
-                <HiGlobeAlt className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span className="line-clamp-1">{doctor.languages}</span>
-              </div>
-            )}
-
-            {doctor.hospital?.name && (
-              <div className="flex items-start gap-2 text-xs text-gray-600">
-                <HiOfficeBuilding className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span className="line-clamp-1">{doctor.hospital.name}</span>
-              </div>
-            )}
-
-  
-
-            {doctor.email && (
-              <div className="flex items-start gap-2 text-xs text-gray-600">
-                <HiMail className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span className="line-clamp-1 truncate">{doctor.email}</span>
-              </div>
-            )}
           </div>
 
           {/* Pricing Section */}
-          <div className="pt-4 border-t border-gray-100 mb-4">
-            <div className="space-y-2">
-              {doctor.card_price && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <HiVideoCamera className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs text-gray-500">Video Consult</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                 
-                    <span className="text-lg font-black text-blue-600">
-                      ${doctor.card_price}
-                    </span>
-                  </div>
-                </div>
-              )}
-              {doctor.appointment_price && doctor.type?.includes("Appointment") && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <HiClock className="w-4 h-4 text-gray-500" />
-                    <span className="text-xs text-gray-500">In-Person</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                    <HiCurrencyDollar className="w-4 h-4 text-gray-600" />
-                    <span className="text-base font-bold text-gray-700">
-                      {doctor.appointment_price}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+       
 
           {/* Status and Action */}
           <div className="space-y-2">
